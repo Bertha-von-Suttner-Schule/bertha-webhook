@@ -11,13 +11,27 @@ style('bertha_webhook', 'admin');
 		<?php p($l->t('Leitet 1:1-Chat-Nachrichten an einen Bot-User per HMAC-signiertem Webhook weiter.')); ?>
 	</p>
 
+	<div id="bertha-no-group" class="bertha-warning" hidden>
+		<strong>⚠️ <?php p($l->t('Gruppe fehlt:')); ?></strong>
+		<?php print_unescaped($l->t('Die NC-Gruppe %s existiert noch nicht. Erstelle sie zuerst im Bereich "Konten" und füge dort die Bot-User-Accounts hinzu (z.B. <code>bertha.ki</code>). Erst danach kann hier ein Bot ausgewählt werden.', ['<code id="bertha-group-name"></code>'])); ?>
+	</div>
+
+	<div id="bertha-no-bots" class="bertha-warning" hidden>
+		<strong>⚠️ <?php p($l->t('Keine Bot-User vorhanden:')); ?></strong>
+		<?php print_unescaped($l->t('Die Gruppe %s existiert, ist aber leer. Füge mindestens einen User in diese Gruppe hinzu, der als Bot fungieren soll.', ['<code id="bertha-group-name-2"></code>'])); ?>
+	</div>
+
 	<form id="bertha-webhook-form" autocomplete="off">
 		<div class="bertha-field">
-			<label for="bertha-bot-user"><?php p($l->t('Bot-User-ID')); ?></label>
-			<input type="text" id="bertha-bot-user" name="bot_user"
-				placeholder="bertha.ki"
-				autocomplete="off" />
-			<p class="bertha-help"><?php p($l->t('Nextcloud-User-ID des Bots. Nur Nachrichten in 1:1-Räumen mit diesem User werden weitergeleitet.')); ?></p>
+			<label for="bertha-bot-user"><?php p($l->t('Bot-User')); ?></label>
+			<select id="bertha-bot-user" name="bot_user">
+				<option value=""><?php p($l->t('— bitte auswählen —')); ?></option>
+			</select>
+			<p class="bertha-help">
+				<?php p($l->t('Nur User in der Gruppe')); ?>
+				<code id="bertha-group-name-3">_bots</code>
+				<?php p($l->t('sind als Bot zugelassen. Nachrichten in 1:1-Räumen mit diesem User werden weitergeleitet.')); ?>
+			</p>
 		</div>
 
 		<div class="bertha-field">
@@ -42,4 +56,8 @@ style('bertha_webhook', 'admin');
 			<span id="bertha-status" class="bertha-status"></span>
 		</div>
 	</form>
+
+	<p class="settings-hint bertha-audit-note">
+		<?php p($l->t('Jede Änderung dieser Einstellungen wird im NC-Log mit Zeitpunkt und ändernder Person protokolliert.')); ?>
+	</p>
 </div>

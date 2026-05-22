@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace OCA\BerthaWebhook\Listener;
 
 use OCA\BerthaWebhook\AppInfo\Application;
+use OCA\BerthaWebhook\Service\AppConfigService;
 use OCA\Talk\Events\ChatMessageSentEvent;
 use OCA\Talk\Exceptions\ParticipantNotFoundException;
 use OCA\Talk\Room;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\Http\Client\IClientService;
-use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -20,13 +20,18 @@ use Psr\Log\LoggerInterface;
  * Filtert auf 1:1-Unterhaltungen mit dem konfigurierten Bot-User
  * und leitet relevante Nachrichten per HMAC-signiertem Webhook weiter.
  *
+ * Sicherheits-Schranke: der konfigurierte Bot-User muss Mitglied in der
+ * NC-Gruppe `_bots` sein, sonst wird die Nachricht schweigend verworfen.
+ * Verhindert, dass durch fehlerhafte oder böswillige Settings-Änderung
+ * private 1:1-Chats eines regulären Users an die Webhook-URL leaken.
+ *
  * @implements IEventListener<ChatMessageSentEvent>
  */
 class ChatMessageListener implements IEventListener {
 
 	public function __construct(
 		private IClientService $clientService,
-		private IAppConfig $appConfig,
+		private AppConfigService $config,
 		private LoggerInterface $logger,
 	) {
 	}
@@ -39,11 +44,12 @@ class ChatMessageListener implements IEventListener {
 		$room = $event->getRoom();
 		$comment = $event->getComment();
 
-		$botUserId = $this->appConfig->getValueString(
-			Application::APP_ID, 'bot_user', 'bertha.ki'
-		);
+		$botUserId = $this->config->getBotUser();
+		if ($botUserId === '') {
+			return;
+		}
 
-		// Eigene Nachrichten ignorieren (Antworten von n8n als bertha.ki)
+		// Eigene Nachrichten ignorieren (Antworten vom Bot selbst)
 		if ($comment->getActorType() !== 'users' || $comment->getActorId() === $botUserId) {
 			return;
 		}
@@ -53,10 +59,18 @@ class ChatMessageListener implements IEventListener {
 			return;
 		}
 
-		// Pruefen ob der Bot-User in dieser Unterhaltung ist.
-		// In einer 1:1-Unterhaltung gibt es exakt 2 Teilnehmer.
-		// Wenn der Absender nicht der Bot ist UND der Bot nicht im Raum ist,
-		// dann ist es eine fremde 1:1-Unterhaltung → ignorieren.
+		// Sicherheits-Schranke: Bot-User muss in der `_bots`-Gruppe sein
+		if (!$this->config->isAllowedBot($botUserId)) {
+			$this->logger->warning(
+				'bertha_webhook: Konfigurierter bot_user "' . $botUserId
+				. '" ist nicht in Gruppe "' . AppConfigService::BOTS_GROUP
+				. '". Nachricht wird nicht weitergeleitet.',
+				['app' => Application::APP_ID]
+			);
+			return;
+		}
+
+		// Bot-User muss in dieser Unterhaltung Teilnehmer sein
 		try {
 			$room->getParticipant($botUserId);
 		} catch (ParticipantNotFoundException) {
@@ -67,15 +81,17 @@ class ChatMessageListener implements IEventListener {
 	}
 
 	private function forwardToWebhook(\OCP\Comments\IComment $comment, Room $room): void {
-		$webhookUrl = $this->appConfig->getValueString(
-			Application::APP_ID, 'webhook_url', ''
-		);
-		$webhookSecret = $this->appConfig->getValueString(
-			Application::APP_ID, 'webhook_secret', ''
-		);
+		$webhookUrl = $this->config->getWebhookUrl();
+		$webhookSecret = $this->config->getWebhookSecret();
 
 		if ($webhookUrl === '') {
-			$this->logger->warning('bertha_webhook: Keine webhook_url konfiguriert');
+			$this->logger->warning('bertha_webhook: Keine webhook_url konfiguriert',
+				['app' => Application::APP_ID]);
+			return;
+		}
+		if ($webhookSecret === '') {
+			$this->logger->warning('bertha_webhook: Kein webhook_secret konfiguriert',
+				['app' => Application::APP_ID]);
 			return;
 		}
 
@@ -104,7 +120,8 @@ class ChatMessageListener implements IEventListener {
 			]);
 		} catch (\Exception $e) {
 			$this->logger->error(
-				'bertha_webhook: Webhook-Aufruf fehlgeschlagen: ' . $e->getMessage()
+				'bertha_webhook: Webhook-Aufruf fehlgeschlagen: ' . $e->getMessage(),
+				['app' => Application::APP_ID]
 			);
 		}
 	}

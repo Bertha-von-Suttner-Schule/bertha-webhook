@@ -42,17 +42,23 @@ sudo -u www-data php /var/www/html/occ app:enable bertha_webhook
 
 ## Konfiguration
 
+**Voraussetzung:** Lege in NC die Gruppe `_bots` an und füge dort den Bot-User-Account ein (z.B. `bertha.ki`). Nur Mitglieder dieser Gruppe sind als Bot zugelassen — eine Schranke gegen unbeabsichtigtes Weiterleiten regulärer 1:1-Chats.
+
 In Nextcloud: **Verwaltungseinstellungen → Bertha Webhook Bridge**
 
 | Feld | Beispiel |
 |---|---|
-| Bot-User-ID | `bertha.ki` |
+| Bot-User | Dropdown aus `_bots`-Gruppen-Mitgliedern (z.B. `bertha.ki`) |
 | Webhook-URL | `https://n8n.example.com/webhook/bertha-talk-push` |
 | Shared Secret | 64-stelliger Hex-String (mind. 32 Zeichen) |
 
-Alternativ per `occ`:
+Alle Setting-Änderungen werden mit Actor und Diff im NC-Log protokolliert (Audit).
+
+Alternativ per `occ` (Bot-User-Validation greift weiterhin — User muss in `_bots` sein):
 
 ```bash
+sudo -u www-data php occ group:add _bots
+sudo -u www-data php occ group:adduser _bots bertha.ki
 sudo -u www-data php occ config:app:set bertha_webhook bot_user --value="bertha.ki"
 sudo -u www-data php occ config:app:set bertha_webhook webhook_url --value="https://n8n.example.com/webhook/bertha-talk-push"
 sudo -u www-data php occ config:app:set bertha_webhook webhook_secret --value="<64-stelliger-hex-string>"
