@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build tarball
+        run: bash scripts/build-tarball.sh
+
+      - name: Stable-name copy for /releases/latest/download
+        run: cp dist/bertha_webhook-*.tar.gz dist/bertha_webhook-latest.tar.gz
+
+      - name: Extract CHANGELOG section for this tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          awk -v v="$VERSION" '
+            /^## / {
+              if (active) exit
+              if ($0 ~ "^## " v "( |$|\\()") active=1
+              next
+            }
+            active { print }
+          ' CHANGELOG.md > /tmp/release-notes.md
+          if [ ! -s /tmp/release-notes.md ]; then
+            echo "Release v${VERSION} — siehe CHANGELOG.md im Repo." > /tmp/release-notes.md
+          fi
+          cat /tmp/release-notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/bertha_webhook-*.tar.gz
+          body_path: /tmp/release-notes.md
+          draft: false
+          prerelease: false

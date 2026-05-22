@@ -1,0 +1,46 @@
+#bertha-webhook-admin {
+	max-width: 640px;
+}
+
+#bertha-webhook-admin .settings-hint {
+	color: var(--color-text-lighter);
+	margin-bottom: 20px;
+}
+
+#bertha-webhook-admin .bertha-field {
+	margin-bottom: 24px;
+}
+
+#bertha-webhook-admin .bertha-field label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 6px;
+}
+
+#bertha-webhook-admin .bertha-field input {
+	width: 100%;
+	max-width: 520px;
+	padding: 8px 12px;
+	font-family: var(--font-face);
+}
+
+#bertha-webhook-admin .bertha-help {
+	color: var(--color-text-lighter);
+	font-size: 0.9em;
+	margin-top: 4px;
+}
+
+#bertha-webhook-admin .bertha-actions {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin-top: 24px;
+}
+
+#bertha-webhook-admin .bertha-status {
+	font-size: 0.95em;
+}
+
+#bertha-webhook-admin .bertha-status.success { color: var(--color-success); }
+#bertha-webhook-admin .bertha-status.error { color: var(--color-error); }
+#bertha-webhook-admin .bertha-status.pending { color: var(--color-text-lighter); }

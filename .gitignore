@@ -1,0 +1,14 @@
+vendor/
+node_modules/
+.DS_Store
+*.log
+.idea/
+.vscode/
+dist/
+*.tar.gz
+
+# Secrets dürfen nie ins Repo
+.env
+.env.*
+*.secret
+secrets/
