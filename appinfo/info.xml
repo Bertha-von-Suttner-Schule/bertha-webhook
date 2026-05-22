@@ -18,7 +18,7 @@ Konfiguration über die NC-Admin-Settings (Sidebar → Bertha Webhook Bridge):
 Filterung serverseitig: Nur 1:1-Räume, in denen der Bot-User Teilnehmer ist,
 und nicht-eigene Nachrichten lösen den Webhook aus.
 ]]></description>
-	<version>0.1.1</version>
+	<version>0.1.2</version>
 	<licence>agpl</licence>
 	<author>Bertha-von-Suttner-Schule IT</author>
 	<namespace>BerthaWebhook</namespace>

@@ -10,6 +10,8 @@ Teil der [bertha.Cloud](https://cloud.bertha-online.de)-Infrastruktur der Bertha
 - Filterung serverseitig:
   - Nur 1:1-Räume (`Room::TYPE_ONE_TO_ONE`)
   - Bot-User muss Teilnehmer sein
+  - Bot-User muss in NC-Gruppe `_bots` sein (Whitelist gegen unbeabsichtigte Konfiguration)
+  - Absender muss die App nutzen dürfen (NC-Standard-Gruppen-Beschränkung, Verwaltung → Apps)
   - Eigene Nachrichten des Bots werden ignoriert (kein Echo)
 - POST an die konfigurierte Webhook-URL mit:
   - JSON-Body `{userId, message, conversationToken, messageId, timestamp}`
@@ -43,6 +45,8 @@ sudo -u www-data php /var/www/html/occ app:enable bertha_webhook
 ## Konfiguration
 
 **Voraussetzung:** Lege in NC die Gruppe `_bots` an und füge dort den Bot-User-Account ein (z.B. `bertha.ki`). Nur Mitglieder dieser Gruppe sind als Bot zugelassen — eine Schranke gegen unbeabsichtigtes Weiterleiten regulärer 1:1-Chats.
+
+**Pilot/User-Whitelist:** Wenn nur eine bestimmte Gruppe (z.B. `_bertha_pilot`) den Bot ansprechen darf: **Verwaltung → Apps → "Bertha Webhook Bridge" → "Auf Gruppen beschränken"** und die Pilot-Gruppe auswählen. Ohne Beschränkung können alle NC-Nutzer:innen den Bot anschreiben.
 
 In Nextcloud: **Verwaltungseinstellungen → Bertha Webhook Bridge**
 

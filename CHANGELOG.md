@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.2 (2026-05-22)
+
+**User-Whitelist über NC-Standard-App-Group-Restriction**
+
+- Listener respektiert NC's eingebaute App-Group-Beschränkung: nur Absender, für die die App aktiviert ist (Verwaltung → Apps → "Bertha Webhook Bridge" → "Auf Gruppen beschränken"), lösen einen Webhook aus
+- Pilotbetrieb möglich ohne eigenes Setting — Admin legt einfach eine Pilot-Gruppe an, aktiviert die App auf diese Gruppe, alle anderen User werden silent ignoriert
+- Settings-UI: Hinweis-Box erklärt, wo die Einschränkung gesetzt wird
+
 ## 0.1.1 (2026-05-22)
 
 **Security Hardening**

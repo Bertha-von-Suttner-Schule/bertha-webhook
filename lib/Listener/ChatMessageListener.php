@@ -9,9 +9,11 @@ use OCA\BerthaWebhook\Service\AppConfigService;
 use OCA\Talk\Events\ChatMessageSentEvent;
 use OCA\Talk\Exceptions\ParticipantNotFoundException;
 use OCA\Talk\Room;
+use OCP\App\IAppManager;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\Http\Client\IClientService;
+use OCP\IUserManager;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -20,10 +22,12 @@ use Psr\Log\LoggerInterface;
  * Filtert auf 1:1-Unterhaltungen mit dem konfigurierten Bot-User
  * und leitet relevante Nachrichten per HMAC-signiertem Webhook weiter.
  *
- * Sicherheits-Schranke: der konfigurierte Bot-User muss Mitglied in der
- * NC-Gruppe `_bots` sein, sonst wird die Nachricht schweigend verworfen.
- * Verhindert, dass durch fehlerhafte oder böswillige Settings-Änderung
- * private 1:1-Chats eines regulären Users an die Webhook-URL leaken.
+ * Sicherheits-Schranken:
+ * - Bot-User muss Mitglied in NC-Gruppe `_bots` sein
+ *   (verhindert Leak privater 1:1-Chats bei Setting-Fehlbedienung)
+ * - Absender muss die App nutzen dürfen (NC-Standard-App-Gruppen-Restriction).
+ *   Admin kann das in NC-Admin-UI → Apps → "Bertha Webhook Bridge" einstellen.
+ *   So lässt sich der Pilotbetrieb auf eine Gruppe (z.B. `_bertha_pilot`) einschränken.
  *
  * @implements IEventListener<ChatMessageSentEvent>
  */
@@ -32,6 +36,8 @@ class ChatMessageListener implements IEventListener {
 	public function __construct(
 		private IClientService $clientService,
 		private AppConfigService $config,
+		private IAppManager $appManager,
+		private IUserManager $userManager,
 		private LoggerInterface $logger,
 	) {
 	}
@@ -59,7 +65,7 @@ class ChatMessageListener implements IEventListener {
 			return;
 		}
 
-		// Sicherheits-Schranke: Bot-User muss in der `_bots`-Gruppe sein
+		// Schranke 1: Bot-User muss in `_bots`-Gruppe sein
 		if (!$this->config->isAllowedBot($botUserId)) {
 			$this->logger->warning(
 				'bertha_webhook: Konfigurierter bot_user "' . $botUserId
@@ -67,6 +73,14 @@ class ChatMessageListener implements IEventListener {
 				. '". Nachricht wird nicht weitergeleitet.',
 				['app' => Application::APP_ID]
 			);
+			return;
+		}
+
+		// Schranke 2: Absender muss die App nutzen dürfen
+		// (respektiert NC's eingebaute App-Group-Restriction über Apps-Admin-UI)
+		$actor = $this->userManager->get($comment->getActorId());
+		if ($actor === null || !$this->appManager->isEnabledForUser(Application::APP_ID, $actor)) {
+			// Schweigend droppen — kein Logging, sonst Log-Spam bei vielen unberechtigten Usern
 			return;
 		}
 
@@ -103,7 +117,6 @@ class ChatMessageListener implements IEventListener {
 			'timestamp' => time(),
 		], JSON_THROW_ON_ERROR);
 
-		// HMAC-Signatur generieren (gleiches Schema wie Talk Bot API)
 		$random = bin2hex(random_bytes(32));
 		$signature = hash_hmac('sha256', $random . $payload, $webhookSecret);
 
