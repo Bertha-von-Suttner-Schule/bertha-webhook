@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.1 (2026-05-26)
+
+**File-Share-Listener**
+
+- Neuer `FileShareListener` fuer `ShareCreatedEvent`: faengt File-Shares an Talk 1:1-Raeume ab und sendet Webhook mit File-Metadaten
+- Gleiche Sicherheits-Schranken wie ChatMessageListener (Bot in `_bots`, App-Gruppen-Restriction, 1:1-Check)
+- Noetig weil `ChatMessageSentEvent` NICHT fuer File-Shares feuert — Talk erstellt die `{file}`-Nachricht ueber einen internen Code-Pfad
+- Audio-Dateien (`audio/*`) werden als `type: "voice-message"` markiert fuer STT-Pipeline
+
+## 0.2.0 (2026-05-26)
+
+**Payload-Erweiterung fuer File-Support**
+
+- Webhook-Payload enthaelt jetzt `messageType` und `messageParameters` aus dem Talk ChatMessage-Objekt
+- Ermoeglicht dem Push Receiver die Verarbeitung von Dateianhängen (PDF, Bilder, Spreadsheets) und Sprachnachrichten
+- Neues Feld `hasFilePlaceholder` als Fallback-Signal wenn `getChatMessage()` nicht verfuegbar ist
+- Fallback: Falls Talk-API `getChatMessage()` nicht unterstuetzt, wird `messageType: 'unknown'` gesendet — n8n holt Details per Talk API nach
+
 ## 0.1.2 (2026-05-22)
 
 **User-Whitelist über NC-Standard-App-Group-Restriction**

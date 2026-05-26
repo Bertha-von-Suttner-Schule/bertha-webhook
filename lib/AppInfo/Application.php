@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace OCA\BerthaWebhook\AppInfo;
 
 use OCA\BerthaWebhook\Listener\ChatMessageListener;
+use OCA\BerthaWebhook\Listener\FileShareListener;
 use OCA\Talk\Events\ChatMessageSentEvent;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
+use OCP\Share\Events\ShareCreatedEvent;
 
 class Application extends App implements IBootstrap {
 
@@ -23,6 +25,10 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(
 			ChatMessageSentEvent::class,
 			ChatMessageListener::class
+		);
+		$context->registerEventListener(
+			ShareCreatedEvent::class,
+			FileShareListener::class
 		);
 	}
 

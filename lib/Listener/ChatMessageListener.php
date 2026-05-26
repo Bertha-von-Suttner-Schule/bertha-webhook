@@ -91,10 +91,53 @@ class ChatMessageListener implements IEventListener {
 			return;
 		}
 
-		$this->forwardToWebhook($comment, $room);
+		$this->forwardToWebhook($event, $comment, $room);
 	}
 
-	private function forwardToWebhook(\OCP\Comments\IComment $comment, Room $room): void {
+	/**
+	 * Extrahiert messageType und messageParameters aus dem Event.
+	 *
+	 * Primaerer Weg: getChatMessage() auf dem Event (Talk 20.x / NC 30+).
+	 * Fallback: Regex-Erkennung von {file}/{object}-Platzhaltern im Rohtext.
+	 *
+	 * @return array{messageType: string, messageParameters: array<string,mixed>, hasFilePlaceholder: bool}
+	 */
+	private function extractMessageMeta(ChatMessageSentEvent $event, \OCP\Comments\IComment $comment): array {
+		// --- Primaerer Ansatz: ChatMessage-Objekt vom Event ---
+		try {
+			if (method_exists($event, 'getChatMessage')) {
+				$chatMessage = $event->getChatMessage();
+				$messageType = method_exists($chatMessage, 'getMessageType')
+					? (string) $chatMessage->getMessageType()
+					: 'unknown';
+				$messageParameters = method_exists($chatMessage, 'getMessageParameters')
+					? $chatMessage->getMessageParameters()
+					: [];
+
+				$rawText = $comment->getMessage();
+				return [
+					'messageType' => $messageType,
+					'messageParameters' => $messageParameters,
+					'hasFilePlaceholder' => (bool) preg_match('/\{(file|object)\}/', $rawText),
+				];
+			}
+		} catch (\Throwable $e) {
+			$this->logger->debug(
+				'bertha_webhook: getChatMessage()-Extraktion fehlgeschlagen, nutze Fallback: ' . $e->getMessage(),
+				['app' => Application::APP_ID]
+			);
+		}
+
+		// --- Fallback: Regex-Erkennung auf Rohtext ---
+		$rawText = $comment->getMessage();
+		return [
+			'messageType' => 'unknown',
+			'messageParameters' => [],
+			'hasFilePlaceholder' => (bool) preg_match('/\{(file|object)\}/', $rawText),
+		];
+	}
+
+	private function forwardToWebhook(ChatMessageSentEvent $event, \OCP\Comments\IComment $comment, Room $room): void {
 		$webhookUrl = $this->config->getWebhookUrl();
 		$webhookSecret = $this->config->getWebhookSecret();
 
@@ -109,12 +152,17 @@ class ChatMessageListener implements IEventListener {
 			return;
 		}
 
+		$meta = $this->extractMessageMeta($event, $comment);
+
 		$payload = json_encode([
 			'userId' => $comment->getActorId(),
 			'message' => $comment->getMessage(),
 			'conversationToken' => $room->getToken(),
 			'messageId' => (int) $comment->getId(),
 			'timestamp' => time(),
+			'messageType' => $meta['messageType'],
+			'messageParameters' => $meta['messageParameters'],
+			'hasFilePlaceholder' => $meta['hasFilePlaceholder'],
 		], JSON_THROW_ON_ERROR);
 
 		$random = bin2hex(random_bytes(32));
