@@ -1,22 +1,33 @@
 # Bertha Webhook Bridge
 
-Minimale Nextcloud-App, die Chat-Nachrichten aus 1:1-Räumen mit einem konfigurierten Bot-User per HMAC-signiertem Webhook an einen externen Endpunkt (z.B. n8n) weiterleitet.
+Nextcloud-App, die Chat-Nachrichten und File-Shares aus 1:1-Raeumen mit einem konfigurierten Bot-User per HMAC-signiertem Webhook an einen externen Endpunkt (z.B. n8n) weiterleitet.
 
 Teil der [bertha.Cloud](https://cloud.bertha-online.de)-Infrastruktur der Bertha-von-Suttner-Schule.
 
 ## Funktionsweise
 
-- Lauscht auf `OCA\Talk\Events\ChatMessageSentEvent`
-- Filterung serverseitig:
-  - Nur 1:1-Räume (`Room::TYPE_ONE_TO_ONE`)
-  - Bot-User muss Teilnehmer sein
-  - Bot-User muss in NC-Gruppe `_bots` sein (Whitelist gegen unbeabsichtigte Konfiguration)
-  - Absender muss die App nutzen dürfen (NC-Standard-Gruppen-Beschränkung, Verwaltung → Apps)
-  - Eigene Nachrichten des Bots werden ignoriert (kein Echo)
-- POST an die konfigurierte Webhook-URL mit:
-  - JSON-Body `{userId, message, conversationToken, messageId, timestamp}`
-  - Header `X-Bertha-Random` (32 Bytes hex)
-  - Header `X-Bertha-Signature` (HMAC-SHA256 über `random + body`)
+Zwei Event-Listener decken unterschiedliche Nachrichtentypen ab:
+
+**ChatMessageListener** (`ChatMessageSentEvent`) — Textnachrichten und Commands:
+- Payload: `{userId, message, conversationToken, messageId, timestamp, messageType, messageParameters, hasFilePlaceholder}`
+
+**FileShareListener** (`ShareCreatedEvent`) — Dateianhänge und Sprachnachrichten:
+- Fängt File-Shares an Talk-Räume ab (`shareType=10`)
+- Nötig weil `ChatMessageSentEvent` nicht für File-Shares feuert (Talk erstellt die `{file}`-Nachricht über einen internen Code-Pfad)
+- Audio-Dateien (`audio/*`) werden als `type: "voice-message"` markiert
+- Payload: `{userId, message: "{file}", conversationToken, messageId: "share-<id>", timestamp, messageType: "file-share", messageParameters: {file: {...}}}`
+
+**Gemeinsame Filterung** (beide Listener):
+- Nur 1:1-Räume (`Room::TYPE_ONE_TO_ONE`) — Gruppenräume werden ignoriert
+- Bot-User muss Teilnehmer sein
+- Bot-User muss in NC-Gruppe `_bots` sein (Whitelist gegen unbeabsichtigte Konfiguration)
+- Absender muss die App nutzen dürfen (NC-Standard-Gruppen-Beschränkung, Verwaltung → Apps)
+- Eigene Nachrichten/Shares des Bots werden ignoriert (kein Echo)
+
+**Webhook-Format** (beide Listener identisch):
+- POST an die konfigurierte Webhook-URL
+- Header `X-Bertha-Random` (32 Bytes hex)
+- Header `X-Bertha-Signature` (HMAC-SHA256 über `random + body`)
 
 ## Installation
 
@@ -82,6 +93,34 @@ if (signature !== expected) throw new Error('HMAC validation failed');
 ```
 
 > **Wichtig (n8n 2.x):** Der originale Request-Body liegt unter `$input.first().binary.data.data` als Base64, **nicht** unter `$input.first().json.rawBody`. PHP escaped `/` zu `\/` in JSON-Bodies, JavaScript nicht — eigene Re-Serialisierung schlägt fehl.
+
+## Performance
+
+Die App ist auf minimale Serverlast ausgelegt. Beide Listener verwenden gestaffelte Early-Returns — teure Operationen (DB-Queries, HTTP-Calls) laufen nur fuer die wenigen qualifizierenden Nachrichten.
+
+**ChatMessageListener** — feuert bei jeder Talk-Nachricht:
+
+| Pruefung | Kosten | Filtert |
+|---|---|---|
+| Bot konfiguriert? | AppConfig-Cache (RAM) | Wenn nicht konfiguriert |
+| Eigene Nachricht? | String-Vergleich (RAM) | Bot-Echo |
+| **1:1-Raum?** | **Bereits im Event geladen (RAM)** | **~95% aller Nachrichten** |
+| Bot in `_bots`? | 1 DB-Query | Fehlkonfiguration |
+| User darf App nutzen? | 1 DB-Query | Nicht freigeschaltete User |
+| Bot ist Teilnehmer? | 1 DB-Query | 1:1-Raeume ohne Bot |
+
+Der entscheidende Filter (`TYPE_ONE_TO_ONE`) ist ein reiner RAM-Check und verwirft den Grossteil aller Nachrichten (Gruppenraeume, Ankuendigungen, etc.) bevor eine DB-Query noetig ist.
+
+**FileShareListener** — feuert bei jedem Share in Nextcloud:
+
+| Pruefung | Kosten | Filtert |
+|---|---|---|
+| **Share-Typ = Talk-Raum?** | **Integer-Vergleich (RAM)** | **~99% aller Shares** |
+| Weitere Pruefungen | Wie ChatMessageListener | Nur Talk-Room-Shares |
+
+Normales Filesharing (an User, Gruppen, Links) wird nach einem einzigen Integer-Vergleich verworfen.
+
+**Webhook-POST:** Der HTTP-Call zum Webhook-Endpoint blockiert den PHP-Prozess bis zum konfigurierten Timeout (5s). Das betrifft nur qualifizierende Nachrichten (1:1-Chats mit dem Bot). Bei einer Schule mit ~2200 Usern sind das typischerweise wenige Nachrichten pro Minute — vernachlaessigbar gegenueber der sonstigen Talk-Last.
 
 ## Lizenz
 
