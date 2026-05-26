@@ -26,7 +26,7 @@ use Psr\Log\LoggerInterface;
  * - Bot-User muss Mitglied in NC-Gruppe `_bots` sein
  *   (verhindert Leak privater 1:1-Chats bei Setting-Fehlbedienung)
  * - Absender muss die App nutzen dürfen (NC-Standard-App-Gruppen-Restriction).
- *   Admin kann das in NC-Admin-UI → Apps → "Bertha Webhook Bridge" einstellen.
+ *   Admin kann das in NC-Admin-UI → Apps → "bertha.ki" einstellen.
  *   So lässt sich der Pilotbetrieb auf eine Gruppe (z.B. `_bertha_pilot`) einschränken.
  *
  * @implements IEventListener<ChatMessageSentEvent>

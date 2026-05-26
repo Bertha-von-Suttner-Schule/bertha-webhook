@@ -22,7 +22,7 @@ class AdminSection implements IIconSection {
 	}
 
 	public function getName(): string {
-		return $this->l->t('Bertha Webhook Bridge');
+		return $this->l->t('bertha.ki');
 	}
 
 	public function getPriority(): int {

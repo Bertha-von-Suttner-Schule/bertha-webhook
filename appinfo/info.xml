@@ -2,23 +2,24 @@
 <info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
 	<id>bertha_webhook</id>
-	<name>Bertha Webhook Bridge</name>
-	<summary>Leitet Talk-Nachrichten an einen Webhook weiter</summary>
-	<description><![CDATA[Minimale Bridge-App für die bertha.Cloud:
+	<name>bertha.ki</name>
+	<summary>Talk-Integration fuer den bertha.ki Assistenten</summary>
+	<description><![CDATA[Talk-Integration fuer bertha.ki — den KI-Assistenten der bertha.Cloud.
 
-Lauscht auf Chat-Nachrichten in 1:1-Unterhaltungen mit einem
-konfigurierten Bot-User (z.B. `bertha.ki`) und leitet sie per
-HMAC-signiertem Webhook an n8n (oder einen anderen Endpunkt) weiter.
+Leitet Chat-Nachrichten, Dateianhänge und Sprachnachrichten aus
+1:1-Unterhaltungen mit dem Bot-User per HMAC-signiertem Webhook
+an n8n weiter, wo die KI-Verarbeitung stattfindet.
 
-Konfiguration über die NC-Admin-Settings (Sidebar → Bertha Webhook Bridge):
+Konfiguration ueber die NC-Admin-Settings (Sidebar → bertha.ki):
 - **Bot-User-ID** (z.B. `bertha.ki`)
 - **Webhook-URL** (z.B. `https://n8n.example.com/webhook/bertha-talk-push`)
-- **Shared Secret** für HMAC-SHA256
+- **Shared Secret** fuer HMAC-SHA256
 
-Filterung serverseitig: Nur 1:1-Räume, in denen der Bot-User Teilnehmer ist,
-und nicht-eigene Nachrichten lösen den Webhook aus.
+Zwei Event-Listener: ChatMessageSentEvent (Text/Commands) und
+ShareCreatedEvent (Dateianhänge/Sprachnachrichten). Filterung
+serverseitig mit gestaffelten Early-Returns fuer minimale Last.
 ]]></description>
-	<version>0.2.1</version>
+	<version>0.2.2</version>
 	<licence>agpl</licence>
 	<author>Bertha-von-Suttner-Schule IT</author>
 	<namespace>BerthaWebhook</namespace>

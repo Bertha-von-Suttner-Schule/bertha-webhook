@@ -6,7 +6,7 @@ style('bertha_webhook', 'admin');
 ?>
 
 <div id="bertha-webhook-admin" class="section">
-	<h2><?php p($l->t('Bertha Webhook Bridge')); ?></h2>
+	<h2><?php p($l->t('bertha.ki')); ?></h2>
 	<p class="settings-hint">
 		<?php p($l->t('Leitet 1:1-Chat-Nachrichten an einen Bot-User per HMAC-signiertem Webhook weiter.')); ?>
 	</p>
@@ -59,7 +59,7 @@ style('bertha_webhook', 'admin');
 
 	<div class="bertha-info">
 		<strong><?php p($l->t('Wer darf den Bot ansprechen?')); ?></strong>
-		<?php print_unescaped($l->t('Diese App respektiert Nextclouds Standard-App-Berechtigungen. Um den Zugriff z.B. auf eine Pilot-Gruppe zu beschränken: <strong>Verwaltung → Apps → "Bertha Webhook Bridge" → "Auf Gruppen beschränken"</strong> und die gewünschte Gruppe auswählen. Ohne Einschränkung können alle Nutzer:innen den Bot anschreiben.')); ?>
+		<?php print_unescaped($l->t('Diese App respektiert Nextclouds Standard-App-Berechtigungen. Um den Zugriff z.B. auf eine Pilot-Gruppe zu beschränken: <strong>Verwaltung → Apps → "bertha.ki" → "Auf Gruppen beschränken"</strong> und die gewünschte Gruppe auswählen. Ohne Einschränkung können alle Nutzer:innen den Bot anschreiben.')); ?>
 	</div>
 
 	<p class="settings-hint bertha-audit-note">

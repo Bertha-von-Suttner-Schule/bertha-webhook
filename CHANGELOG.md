@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.2 (2026-05-26)
+
+**Rebranding + Icon**
+
+- Display-Name geaendert: "Bertha Webhook Bridge" → "bertha.ki" (ueberall: info.xml, Admin-Settings, Kommentare)
+- Neues App-Icon: Chat-Bubble mit Neural-Net-Dots und KI-Spark
+- APP_ID bleibt `bertha_webhook` (kein Reinstall noetig). Volle APP_ID-Migration auf `bertha_ki` ist fuer ein kuenftiges Major-Release vorgemerkt
+
 ## 0.2.1 (2026-05-26)
 
 **File-Share-Listener**
