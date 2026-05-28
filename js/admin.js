@@ -1,9 +1,9 @@
 (function () {
 	'use strict';
 
-	const state = OCP.InitialState.loadState('bertha_webhook', 'config') || {};
+	const state = OCP.InitialState.loadState('bertha_ki', 'config') || {};
 	const $ = (id) => document.getElementById(id);
-	const form = $('bertha-webhook-form');
+	const form = $('bertha-ki-form');
 	const statusEl = $('bertha-status');
 	const secretStatus = $('bertha-secret-status');
 	const select = $('bertha-bot-user');
@@ -43,10 +43,10 @@
 			select.appendChild(opt);
 		});
 
-		$('bertha-webhook-url').value = state.webhook_url || '';
+		$('bertha-ki-url').value = state.webhook_url || '';
 		secretStatus.textContent = state.webhook_secret_set
-			? t('bertha_webhook', 'gesetzt')
-			: t('bertha_webhook', 'NICHT gesetzt');
+			? t('bertha_ki', 'gesetzt')
+			: t('bertha_ki', 'NICHT gesetzt');
 		secretStatus.style.color = state.webhook_secret_set
 			? 'var(--color-success)'
 			: 'var(--color-warning)';
@@ -66,18 +66,18 @@
 	form.addEventListener('submit', async (ev) => {
 		ev.preventDefault();
 		if (saveBtn.disabled) return;
-		setStatus(t('bertha_webhook', 'Speichern …'), 'pending');
+		setStatus(t('bertha_ki', 'Speichern …'), 'pending');
 
 		const body = {
 			bot_user: select.value,
-			webhook_url: $('bertha-webhook-url').value,
+			webhook_url: $('bertha-ki-url').value,
 		};
-		const secret = $('bertha-webhook-secret').value;
+		const secret = $('bertha-ki-secret').value;
 		if (secret) body.webhook_secret = secret;
 
 		try {
 			const resp = await fetch(
-				OC.generateUrl('/apps/bertha_webhook/api/v1/admin/settings'),
+				OC.generateUrl('/apps/bertha_ki/api/v1/admin/settings'),
 				{
 					method: 'PUT',
 					headers: {
@@ -94,11 +94,11 @@
 			}
 			const data = await resp.json();
 			Object.assign(state, data);
-			$('bertha-webhook-secret').value = '';
+			$('bertha-ki-secret').value = '';
 			paintFromState();
-			setStatus(t('bertha_webhook', 'Gespeichert.'), 'success');
+			setStatus(t('bertha_ki', 'Gespeichert.'), 'success');
 		} catch (e) {
-			setStatus(t('bertha_webhook', 'Fehler: ') + e.message, 'error');
+			setStatus(t('bertha_ki', 'Fehler: ') + e.message, 'error');
 		}
 	});
 

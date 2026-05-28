@@ -1,11 +1,11 @@
 <?php
 /** @var array $_ */
 /** @var \OCP\IL10N $l */
-script('bertha_webhook', 'admin');
-style('bertha_webhook', 'admin');
+script('bertha_ki', 'admin');
+style('bertha_ki', 'admin');
 ?>
 
-<div id="bertha-webhook-admin" class="section">
+<div id="bertha-ki-admin" class="section">
 	<h2><?php p($l->t('bertha.ki')); ?></h2>
 	<p class="settings-hint">
 		<?php p($l->t('Leitet 1:1-Chat-Nachrichten an einen Bot-User per HMAC-signiertem Webhook weiter.')); ?>
@@ -21,7 +21,7 @@ style('bertha_webhook', 'admin');
 		<?php print_unescaped($l->t('Die Gruppe %s existiert, ist aber leer. Füge mindestens einen User in diese Gruppe hinzu, der als Bot fungieren soll.', ['<code id="bertha-group-name-2"></code>'])); ?>
 	</div>
 
-	<form id="bertha-webhook-form" autocomplete="off">
+	<form id="bertha-ki-form" autocomplete="off">
 		<div class="bertha-field">
 			<label for="bertha-bot-user"><?php p($l->t('Bot-User')); ?></label>
 			<select id="bertha-bot-user" name="bot_user">
@@ -35,16 +35,16 @@ style('bertha_webhook', 'admin');
 		</div>
 
 		<div class="bertha-field">
-			<label for="bertha-webhook-url"><?php p($l->t('Webhook-URL')); ?></label>
-			<input type="url" id="bertha-webhook-url" name="webhook_url"
+			<label for="bertha-ki-url"><?php p($l->t('Webhook-URL')); ?></label>
+			<input type="url" id="bertha-ki-url" name="webhook_url"
 				placeholder="https://n8n.example.com/webhook/bertha-talk-push"
 				autocomplete="off" />
 			<p class="bertha-help"><?php p($l->t('HTTPS-Endpunkt, der den signierten POST empfängt.')); ?></p>
 		</div>
 
 		<div class="bertha-field">
-			<label for="bertha-webhook-secret"><?php p($l->t('Shared Secret')); ?></label>
-			<input type="password" id="bertha-webhook-secret" name="webhook_secret"
+			<label for="bertha-ki-secret"><?php p($l->t('Shared Secret')); ?></label>
+			<input type="password" id="bertha-ki-secret" name="webhook_secret"
 				placeholder="<?php p($l->t('Leer lassen, um bestehendes Secret zu behalten')); ?>"
 				autocomplete="new-password" />
 			<p class="bertha-help"><?php p($l->t('Mindestens 32 Zeichen empfohlen. Status:')); ?>

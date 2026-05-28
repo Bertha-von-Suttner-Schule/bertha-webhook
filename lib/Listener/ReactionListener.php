@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\BerthaWebhook\Listener;
+namespace OCA\BerthaKi\Listener;
 
-use OCA\BerthaWebhook\AppInfo\Application;
-use OCA\BerthaWebhook\Service\AppConfigService;
+use OCA\BerthaKi\AppInfo\Application;
+use OCA\BerthaKi\Service\AppConfigService;
 use OCA\Talk\Events\ReactionAddedEvent;
 use OCA\Talk\Exceptions\ParticipantNotFoundException;
 use OCA\Talk\Room;
@@ -133,7 +133,7 @@ class ReactionListener implements IEventListener {
 			]);
 		} catch (\Exception $e) {
 			$this->logger->error(
-				'bertha_webhook: Reaction-Webhook fehlgeschlagen: ' . $e->getMessage(),
+				'bertha_ki: Reaction-Webhook fehlgeschlagen: ' . $e->getMessage(),
 				['app' => Application::APP_ID]
 			);
 		}

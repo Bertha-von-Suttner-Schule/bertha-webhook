@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\BerthaWebhook\Listener;
+namespace OCA\BerthaKi\Listener;
 
-use OCA\BerthaWebhook\AppInfo\Application;
-use OCA\BerthaWebhook\Service\AppConfigService;
+use OCA\BerthaKi\AppInfo\Application;
+use OCA\BerthaKi\Service\AppConfigService;
 use OCA\Talk\Exceptions\ParticipantNotFoundException;
 use OCA\Talk\Manager as TalkManager;
 use OCA\Talk\Room;
@@ -142,7 +142,7 @@ class FileShareListener implements IEventListener {
 			]);
 		} catch (\Exception $e) {
 			$this->logger->error(
-				'bertha_webhook: File-Share-Webhook fehlgeschlagen: ' . $e->getMessage(),
+				'bertha_ki: File-Share-Webhook fehlgeschlagen: ' . $e->getMessage(),
 				['app' => Application::APP_ID]
 			);
 		}

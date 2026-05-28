@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.0 (2026-05-28)
+
+**Full Rename: bertha_webhook → bertha_ki (BREAKING)**
+
+- APP_ID `bertha_webhook` → `bertha_ki`
+- Namespace `OCA\BerthaWebhook` → `OCA\BerthaKi`
+- GitHub-Repo `bertha-webhook` → `bertha-ki`
+- min-version auf NC 32 (Talk 22 fuer Reactions noetig), max-version 33
+- DOM-IDs in Admin-Settings-UI angeglichen (`bertha-ki-*`)
+
+**Migration:** Alte App `bertha_webhook` muss deinstalliert werden, neue `bertha_ki` installieren. Settings (`bot_user`, `webhook_url`, `webhook_secret`) muessen neu gesetzt werden.
+
 ## 0.3.0 (2026-05-28)
 
 **Replies + Reactions + Code-Cleanup**

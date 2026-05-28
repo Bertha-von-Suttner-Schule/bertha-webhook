@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OCA\BerthaWebhook\Service;
+namespace OCA\BerthaKi\Service;
 
-use OCA\BerthaWebhook\AppInfo\Application;
+use OCA\BerthaKi\AppInfo\Application;
 use OCP\IAppConfig;
 use OCP\IGroupManager;
 use OCP\IUserManager;

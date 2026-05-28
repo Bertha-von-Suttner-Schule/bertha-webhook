@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
-	<id>bertha_webhook</id>
+	<id>bertha_ki</id>
 	<name>bertha.ki</name>
 	<summary>Talk-Integration fuer den bertha.ki Assistenten</summary>
 	<description><![CDATA[Talk-Integration fuer bertha.ki — den KI-Assistenten der bertha.Cloud.
@@ -19,18 +19,18 @@ Zwei Event-Listener: ChatMessageSentEvent (Text/Commands) und
 ShareCreatedEvent (Dateianhänge/Sprachnachrichten). Filterung
 serverseitig mit gestaffelten Early-Returns fuer minimale Last.
 ]]></description>
-	<version>0.3.0</version>
+	<version>0.4.0</version>
 	<licence>agpl</licence>
 	<author>Bertha-von-Suttner-Schule IT</author>
-	<namespace>BerthaWebhook</namespace>
+	<namespace>BerthaKi</namespace>
 	<category>integration</category>
-	<bugs>https://github.com/Bertha-von-Suttner-Schule/bertha-webhook/issues</bugs>
-	<repository>https://github.com/Bertha-von-Suttner-Schule/bertha-webhook</repository>
+	<bugs>https://github.com/Bertha-von-Suttner-Schule/bertha-ki/issues</bugs>
+	<repository>https://github.com/Bertha-von-Suttner-Schule/bertha-ki</repository>
 	<dependencies>
-		<nextcloud min-version="30" max-version="32" />
+		<nextcloud min-version="32" max-version="33" />
 	</dependencies>
 	<settings>
-		<admin>OCA\BerthaWebhook\Settings\AdminSettings</admin>
-		<admin-section>OCA\BerthaWebhook\Settings\AdminSection</admin-section>
+		<admin>OCA\BerthaKi\Settings\AdminSettings</admin>
+		<admin-section>OCA\BerthaKi\Settings\AdminSection</admin-section>
 	</settings>
 </info>

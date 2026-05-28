@@ -1,5 +1,5 @@
 {
-	"name": "bertha-von-suttner-schule/bertha_webhook",
+	"name": "bertha-von-suttner-schule/bertha_ki",
 	"description": "Nextcloud Talk → Webhook Bridge für bertha.Cloud",
 	"type": "project",
 	"license": "AGPL-3.0-or-later",
@@ -8,7 +8,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"OCA\\BerthaWebhook\\": "lib/"
+			"OCA\\BerthaKi\\": "lib/"
 		}
 	},
 	"config": {

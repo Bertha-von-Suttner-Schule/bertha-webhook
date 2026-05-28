@@ -1,6 +1,6 @@
-# Bertha Webhook Bridge
+# bertha.ki — Talk Integration
 
-Nextcloud-App, die Chat-Nachrichten und File-Shares aus 1:1-Raeumen mit einem konfigurierten Bot-User per HMAC-signiertem Webhook an einen externen Endpunkt (z.B. n8n) weiterleitet.
+Nextcloud-App, die Chat-Nachrichten, Replies, Reactions und File-Shares aus 1:1-Raeumen mit dem bertha.ki Bot-User per HMAC-signiertem Webhook an n8n weiterleitet.
 
 Teil der [bertha.Cloud](https://cloud.bertha-online.de)-Infrastruktur der Bertha-von-Suttner-Schule.
 
@@ -36,7 +36,7 @@ Zwei Event-Listener decken unterschiedliche Nachrichtentypen ab:
 ```bash
 cd /var/www/html/custom_apps  # oder /var/www/html/apps-extra, je nach NC-Setup
 curl -fsSL -o bertha_webhook.tar.gz \
-  https://github.com/Bertha-von-Suttner-Schule/bertha-webhook/releases/latest/download/bertha_webhook-latest.tar.gz
+  https://github.com/Bertha-von-Suttner-Schule/bertha-ki/releases/latest/download/bertha_webhook-latest.tar.gz
 tar -xzf bertha_webhook.tar.gz
 rm bertha_webhook.tar.gz
 chown -R www-data:www-data bertha_webhook
@@ -48,7 +48,7 @@ sudo -u www-data php /var/www/html/occ app:enable bertha_webhook
 
 ```bash
 cd /var/www/html/custom_apps
-git clone https://github.com/Bertha-von-Suttner-Schule/bertha-webhook.git bertha_webhook
+git clone https://github.com/Bertha-von-Suttner-Schule/bertha-ki.git bertha_webhook
 chown -R www-data:www-data bertha_webhook
 sudo -u www-data php /var/www/html/occ app:enable bertha_webhook
 ```
@@ -57,9 +57,9 @@ sudo -u www-data php /var/www/html/occ app:enable bertha_webhook
 
 **Voraussetzung:** Lege in NC die Gruppe `_bots` an und füge dort den Bot-User-Account ein (z.B. `bertha.ki`). Nur Mitglieder dieser Gruppe sind als Bot zugelassen — eine Schranke gegen unbeabsichtigtes Weiterleiten regulärer 1:1-Chats.
 
-**Pilot/User-Whitelist:** Wenn nur eine bestimmte Gruppe (z.B. `_bertha_pilot`) den Bot ansprechen darf: **Verwaltung → Apps → "Bertha Webhook Bridge" → "Auf Gruppen beschränken"** und die Pilot-Gruppe auswählen. Ohne Beschränkung können alle NC-Nutzer:innen den Bot anschreiben.
+**Pilot/User-Whitelist:** Wenn nur eine bestimmte Gruppe (z.B. `_bertha_pilot`) den Bot ansprechen darf: **Verwaltung → Apps → "bertha.ki" → "Auf Gruppen beschränken"** und die Pilot-Gruppe auswählen. Ohne Beschränkung können alle NC-Nutzer:innen den Bot anschreiben.
 
-In Nextcloud: **Verwaltungseinstellungen → Bertha Webhook Bridge**
+In Nextcloud: **Verwaltungseinstellungen → bertha.ki**
 
 | Feld | Beispiel |
 |---|---|

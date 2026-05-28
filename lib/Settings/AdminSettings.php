@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\BerthaWebhook\Settings;
+namespace OCA\BerthaKi\Settings;
 
-use OCA\BerthaWebhook\AppInfo\Application;
-use OCA\BerthaWebhook\Service\AppConfigService;
+use OCA\BerthaKi\AppInfo\Application;
+use OCA\BerthaKi\Service\AppConfigService;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\Settings\ISettings;

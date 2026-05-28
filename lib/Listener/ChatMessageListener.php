@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\BerthaWebhook\Listener;
+namespace OCA\BerthaKi\Listener;
 
-use OCA\BerthaWebhook\AppInfo\Application;
-use OCA\BerthaWebhook\Service\AppConfigService;
+use OCA\BerthaKi\AppInfo\Application;
+use OCA\BerthaKi\Service\AppConfigService;
 use OCA\Talk\Events\ChatMessageSentEvent;
 use OCA\Talk\Exceptions\ParticipantNotFoundException;
 use OCA\Talk\Room;
@@ -68,7 +68,7 @@ class ChatMessageListener implements IEventListener {
 		// Schranke 1: Bot-User muss in `_bots`-Gruppe sein
 		if (!$this->config->isAllowedBot($botUserId)) {
 			$this->logger->warning(
-				'bertha_webhook: Konfigurierter bot_user "' . $botUserId
+				'bertha_ki: Konfigurierter bot_user "' . $botUserId
 				. '" ist nicht in Gruppe "' . AppConfigService::BOTS_GROUP
 				. '". Nachricht wird nicht weitergeleitet.',
 				['app' => Application::APP_ID]
@@ -142,12 +142,12 @@ class ChatMessageListener implements IEventListener {
 		$webhookSecret = $this->config->getWebhookSecret();
 
 		if ($webhookUrl === '') {
-			$this->logger->warning('bertha_webhook: Keine webhook_url konfiguriert',
+			$this->logger->warning('bertha_ki: Keine webhook_url konfiguriert',
 				['app' => Application::APP_ID]);
 			return;
 		}
 		if ($webhookSecret === '') {
-			$this->logger->warning('bertha_webhook: Kein webhook_secret konfiguriert',
+			$this->logger->warning('bertha_ki: Kein webhook_secret konfiguriert',
 				['app' => Application::APP_ID]);
 			return;
 		}
@@ -183,7 +183,7 @@ class ChatMessageListener implements IEventListener {
 			]);
 		} catch (\Exception $e) {
 			$this->logger->error(
-				'bertha_webhook: Webhook-Aufruf fehlgeschlagen: ' . $e->getMessage(),
+				'bertha_ki: Webhook-Aufruf fehlgeschlagen: ' . $e->getMessage(),
 				['app' => Application::APP_ID]
 			);
 		}

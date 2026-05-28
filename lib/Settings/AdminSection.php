@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OCA\BerthaWebhook\Settings;
+namespace OCA\BerthaKi\Settings;
 
-use OCA\BerthaWebhook\AppInfo\Application;
+use OCA\BerthaKi\AppInfo\Application;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\Settings\IIconSection;

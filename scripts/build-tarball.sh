@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 VERSION=$(grep -oP '<version>\K[^<]+' appinfo/info.xml)
-APP_ID="bertha_webhook"
+APP_ID="bertha_ki"
 OUT="dist/${APP_ID}-${VERSION}.tar.gz"
 
 echo "Building ${APP_ID} v${VERSION}"

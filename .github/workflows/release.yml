@@ -17,7 +17,7 @@ jobs:
         run: bash scripts/build-tarball.sh
 
       - name: Stable-name copy for /releases/latest/download
-        run: cp dist/bertha_webhook-*.tar.gz dist/bertha_webhook-latest.tar.gz
+        run: cp dist/bertha_ki-*.tar.gz dist/bertha_ki-latest.tar.gz
 
       - name: Extract CHANGELOG section for this tag
         run: |
@@ -39,7 +39,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/bertha_webhook-*.tar.gz
+            dist/bertha_ki-*.tar.gz
           body_path: /tmp/release-notes.md
           draft: false
           prerelease: false

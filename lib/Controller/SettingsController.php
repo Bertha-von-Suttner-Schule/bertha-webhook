@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\BerthaWebhook\Controller;
+namespace OCA\BerthaKi\Controller;
 
-use OCA\BerthaWebhook\AppInfo\Application;
-use OCA\BerthaWebhook\Service\AppConfigService;
+use OCA\BerthaKi\AppInfo\Application;
+use OCA\BerthaKi\Service\AppConfigService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
@@ -77,7 +77,7 @@ class SettingsController extends Controller {
 		// Audit-Log: jede effektive Settings-Änderung wird mit Actor protokolliert
 		if (!empty($changes)) {
 			$this->logger->warning(
-				'bertha_webhook: Settings geändert durch "' . $actor . '" — '
+				'bertha_ki: Settings geändert durch "' . $actor . '" — '
 				. implode(', ', $changes),
 				['app' => Application::APP_ID, 'audit' => true, 'actor' => $actor]
 			);
