@@ -123,6 +123,7 @@ class FileShareListener implements IEventListener {
 				],
 			],
 			'hasFilePlaceholder' => true,
+			'parent' => null,
 		], JSON_THROW_ON_ERROR);
 
 		$random = bin2hex(random_bytes(32));

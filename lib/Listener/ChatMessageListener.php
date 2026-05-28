@@ -95,45 +95,45 @@ class ChatMessageListener implements IEventListener {
 	}
 
 	/**
-	 * Extrahiert messageType und messageParameters aus dem Event.
+	 * Extrahiert Message-Metadaten aus dem IComment.
 	 *
-	 * Primaerer Weg: getChatMessage() auf dem Event (Talk 20.x / NC 30+).
-	 * Fallback: Regex-Erkennung von {file}/{object}-Platzhaltern im Rohtext.
+	 * Talk's parsed messageType und messageParameters sind im ChatMessageSentEvent
+	 * NICHT verfuegbar — sie werden erst beim API-Serialisieren durch MessageParser
+	 * aufgeloest. Wir setzen hier nur einen Fallback-Indikator hasFilePlaceholder
+	 * fuer {file}/{object}-Pattern; die echten File-Daten kommen über den
+	 * separaten FileShareListener (ShareCreatedEvent).
 	 *
 	 * @return array{messageType: string, messageParameters: array<string,mixed>, hasFilePlaceholder: bool}
 	 */
-	private function extractMessageMeta(ChatMessageSentEvent $event, \OCP\Comments\IComment $comment): array {
-		// --- Primaerer Ansatz: ChatMessage-Objekt vom Event ---
-		try {
-			if (method_exists($event, 'getChatMessage')) {
-				$chatMessage = $event->getChatMessage();
-				$messageType = method_exists($chatMessage, 'getMessageType')
-					? (string) $chatMessage->getMessageType()
-					: 'unknown';
-				$messageParameters = method_exists($chatMessage, 'getMessageParameters')
-					? $chatMessage->getMessageParameters()
-					: [];
-
-				$rawText = $comment->getMessage();
-				return [
-					'messageType' => $messageType,
-					'messageParameters' => $messageParameters,
-					'hasFilePlaceholder' => (bool) preg_match('/\{(file|object)\}/', $rawText),
-				];
-			}
-		} catch (\Throwable $e) {
-			$this->logger->debug(
-				'bertha_webhook: getChatMessage()-Extraktion fehlgeschlagen, nutze Fallback: ' . $e->getMessage(),
-				['app' => Application::APP_ID]
-			);
-		}
-
-		// --- Fallback: Regex-Erkennung auf Rohtext ---
+	private function extractMessageMeta(\OCP\Comments\IComment $comment): array {
 		$rawText = $comment->getMessage();
 		return [
 			'messageType' => 'unknown',
 			'messageParameters' => [],
-			'hasFilePlaceholder' => (bool) preg_match('/\{(file|object)\}/', $rawText),
+			'hasFilePlaceholder' => (bool) preg_match('/\{(file|object)\d*\}/', $rawText),
+		];
+	}
+
+	/**
+	 * Extrahiert Reply-Parent-Info aus dem Event.
+	 *
+	 * Talk's AMessageSentEvent::getParent() liefert das IComment der Nachricht,
+	 * auf die geantwortet wurde — bei normalen Messages null, bei Replies/Threads
+	 * der Parent-Comment.
+	 *
+	 * @return array{id: int, actorType: string, actorId: string, message: string, verb: string}|null
+	 */
+	private function extractParent(ChatMessageSentEvent $event): ?array {
+		$parent = $event->getParent();
+		if ($parent === null) {
+			return null;
+		}
+		return [
+			'id' => (int) $parent->getId(),
+			'actorType' => $parent->getActorType(),
+			'actorId' => $parent->getActorId(),
+			'message' => $parent->getMessage(),
+			'verb' => $parent->getVerb(),
 		];
 	}
 
@@ -152,7 +152,8 @@ class ChatMessageListener implements IEventListener {
 			return;
 		}
 
-		$meta = $this->extractMessageMeta($event, $comment);
+		$meta = $this->extractMessageMeta($comment);
+		$parent = $this->extractParent($event);
 
 		$payload = json_encode([
 			'userId' => $comment->getActorId(),
@@ -163,6 +164,7 @@ class ChatMessageListener implements IEventListener {
 			'messageType' => $meta['messageType'],
 			'messageParameters' => $meta['messageParameters'],
 			'hasFilePlaceholder' => $meta['hasFilePlaceholder'],
+			'parent' => $parent,
 		], JSON_THROW_ON_ERROR);
 
 		$random = bin2hex(random_bytes(32));

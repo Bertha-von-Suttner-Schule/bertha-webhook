@@ -6,7 +6,9 @@ namespace OCA\BerthaWebhook\AppInfo;
 
 use OCA\BerthaWebhook\Listener\ChatMessageListener;
 use OCA\BerthaWebhook\Listener\FileShareListener;
+use OCA\BerthaWebhook\Listener\ReactionListener;
 use OCA\Talk\Events\ChatMessageSentEvent;
+use OCA\Talk\Events\ReactionAddedEvent;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -29,6 +31,10 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(
 			ShareCreatedEvent::class,
 			FileShareListener::class
+		);
+		$context->registerEventListener(
+			ReactionAddedEvent::class,
+			ReactionListener::class
 		);
 	}
 

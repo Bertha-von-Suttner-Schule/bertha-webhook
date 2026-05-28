@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0 (2026-05-28)
+
+**Replies + Reactions + Code-Cleanup**
+
+- ChatMessageListener: `parent`-Feld aus `AMessageSentEvent::getParent()` im Webhook-Payload (fuer Reply-Kontext)
+- ChatMessageListener: toten `method_exists('getChatMessage')`-Zweig entfernt (Methode existiert auch in Talk 22 nicht — verifiziert gegen nextcloud/spreed v22.0.12 Quellcode)
+- Neuer `ReactionListener` fuer `ReactionAddedEvent`: leitet Emoji-Reactions an den Push Receiver weiter
+- FileShareListener: `parent: null` im Payload fuer Konsistenz
+- Endlosschleifen-Schutz: eigene Reactions des Bot-Users werden ignoriert
+
 ## 0.2.2 (2026-05-26)
 
 **Rebranding + Icon**
